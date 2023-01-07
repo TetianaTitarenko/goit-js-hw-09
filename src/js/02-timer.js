@@ -7,16 +7,27 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 const input = document.querySelector("#datetime-picker");
 input.value = ``;
-const button = document.querySelector("button");
-const days = document.querySelector("[data-days]");
-const hours = document.querySelector("[data-hours]");
-const minutes = document.querySelector("[data-minutes]");
-const seconds = document.querySelector("[data-seconds]");
+
+const timer = document.querySelector(".timer");
+timer.style.display = "flex";
+timer.style.gap = "10px";
+timer.style.fontSize = "25px";
+
+const startBtn = document.querySelector("button[data-start]");
+startBtn.setAttribute(`disabled`, true);
+
+let timeId = null;
+let backTime = 0;
+
+const daysDate = document.querySelector("[data-days]");
+const hoursDate = document.querySelector("[data-hours]");
+const minutesDate = document.querySelector("[data-minutes]");
+const secondsDate = document.querySelector("[data-seconds]");
 
 const options = {
   enableTime: true,
   time_24hr: true,
-  // defaultDate: new Date(),
+  defaultDate: new Date(),
     minuteIncrement: 1,
         locale: {
         firstDayOfWeek: 1
@@ -28,54 +39,54 @@ const options = {
 
 const fp = flatpickr(input, options);
 
-const endDate = fp.selectedDates[0];
-console.log(endDate)
-
-
-button.addEventListener(`click`, onClickButton);
-input.addEventListener(`change`, addDate)
+startBtn.addEventListener(`click`, onClickButton);
 
 function onClickButton() {
-
-  let timeId = setInterval(() => {
-
-    const currentDate = new Date();
-    console.log(currentDate)
-
-    // const ms = endDate.getTime() - currentDate.getTime();
-    const ms = endDate - currentDate;
-    console.log(ms);
+  timeId = setInterval(() => {
+    backTime = fp.selectedDates[0] - new Date();
+    const updateTime = convertMs(backTime);
+    console.log(updateTime)
+    updateClock(updateTime);
     
-    if (ms <= 0) {
+    if (updateTime <= 900) {
     clearInterval(timeId)
           }
   }, 1000)
   
 };
 
-function addDate() {
-    if (fp.selectedDates[0] <= new Date()) {
+input.oninput = function () {
+  if (fp.selectedDates[0] <= new Date()) {
+    startBtn.setAttribute(`disabled`, true);
     Notify.failure('Please choose a date in the future');
+  } else {
+    startBtn.removeAttribute(`disabled`);
   }
-  return
 }
 
-// function convertMs(ms) {
-//   // Number of milliseconds per unit of time
-//   const second = 1000;
-//   const minute = second * 60;
-//   const hour = minute * 60;
-//   const day = hour * 24;
+function convertMs(ms) {
+  // Number of milliseconds per unit of time
+  const second = 1000;
+  const minute = second * 60;
+  const hour = minute * 60;
+  const day = hour * 24;
 
-//   // Remaining days
-//   const days = Math.floor(ms / day);
-//   // Remaining hours
-//   const hours = Math.floor((ms % day) / hour);
-//   // Remaining minutes
-//   const minutes = Math.floor(((ms % day) % hour) / minute);
-//   // Remaining seconds
-//   const seconds = Math.floor((((ms % day) % hour) % minute) / second);
+  // Remaining days
+  const days = Math.floor(ms / day);
+  // Remaining hours
+  const hours = Math.floor((ms % day) / hour);
+  // Remaining minutes
+  const minutes = Math.floor(((ms % day) % hour) / minute);
+  // Remaining seconds
+  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
 
-//   return { days, hours, minutes, seconds };
-// }
-
+  return { days, hours, minutes, seconds };
+}
+ 
+function updateClock(
+  { days, hours, minutes, seconds }) {
+  daysDate.textContent = days.toString().padStart(2,0);
+  hoursDate.textContent = hours.toString().padStart(2,0);;
+  minutesDate.textContent = minutes.toString().padStart(2,0);;
+  secondsDate.textContent = seconds.toString().padStart(2,0);;
+}
