@@ -1,58 +1,49 @@
-const refs = {
-  firstDelay: document.querySelector(`input[name='delay']`),
-  delayStep: document.querySelector(`input[name='step']`),
-  amount: document.querySelector(`input[name='amount']`),
-  createBtn: document.querySelector(`button`),
-}
-console.log(refs);
-const amountSum = refs.amount.value;
-console.log(amountSum)
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-const delay = refs.firstDelay.value;
-console.log(delay)
+const firstDelay = document.querySelector(`input[name='delay']`);
+const delayStep = document.querySelector(`input[name='step']`);
+const amount = document.querySelector(`input[name='amount']`);
+const createBtn = document.querySelector(`button`);
 
-refs.createBtn.addEventListener(`submit`, onStart);
 
-// Напиши скрипт, який на момент сабміту форми викликає функцію 
-// createPromise(position, delay) стільки разів, скільки ввели 
-// в поле amount. Під час кожного виклику передай їй номер промісу (position), 
-// що створюється, і затримку, враховуючи першу затримку (delay), 
-// введену користувачем, і крок (step).
-// const amountSum = refs.amount.
+const amountSum = Number(amount.value);
+const firstStep = Number(firstDelay.value);
+const delay = Number(delayStep.value)
+const position = 1
+
+createBtn.addEventListener(`submit`, onStart);
 
 function onStart(evt) {
   evt.preventDefault();
-  for (let i = 0; i <= Number(amountSum); i+1) {
-    const position = +i;
-    createPromise(position, delay)
-    .then(({ position, delay }) => {
-      console.log(`✅ Fulfilled promise ${position} in ${delay}ms`);
-    })
-    .catch(({ position, delay }) => {
-      console.log(`❌ Rejected promise ${position} in ${delay}ms`);
-    });
+  for (let i = 0; i <= amountSum; i+=1) {
+    position = +i;
+    delay = +delay;
+    
+  createPromise().then(({ position, delay }) => {
+    Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
+  })
+  .catch(({ position, delay }) => {
+    Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
+  });
 }
 }
-
 
 function createPromise(position, delay) {
-  const shouldResolve = Math.random() > 0.3;
-  const promise = new Promise((res, rej) =>{
-    if (shouldResolve) {
-        res(position)
+  return new Promise((res, rej) => {
+    const shouldResolve = Math.random() > 0.3;
+    setTimeout(() => {
+          if (shouldResolve) {
+        res({position, delay})
       } else {
-        rej(position)
+        rej({position, delay})
       }
+    }, firstStep)
   })
-  return promise
- 
 }
 
-
-// createPromise(2, 1500)
-//   .then(({ position, delay }) => {
-//     console.log(`✅ Fulfilled promise ${position} in ${delay}ms`);
+// createPromise().then(({ position, delay }) => {
+//     Notify.success(`✅ Fulfilled promise ${position} in ${delay}ms`);
 //   })
 //   .catch(({ position, delay }) => {
-//     console.log(`❌ Rejected promise ${position} in ${delay}ms`);
+//     Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
 //   });
