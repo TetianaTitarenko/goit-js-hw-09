@@ -17,8 +17,8 @@ img {
   max-width: 100%;
 }
 
-/* .field {
+.field {
   display: flex;
   flex-direction: column;
   align-items: center;
-} */
+}
