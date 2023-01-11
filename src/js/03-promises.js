@@ -5,10 +5,12 @@ const delayStep = document.querySelector(`input[name='step']`);
 const amount = document.querySelector(`input[name='amount']`);
 const form = document.querySelector(`form`);
 
+
 form.addEventListener(`submit`, onStart);
 
 function onStart(evt) {
   evt.preventDefault();
+
   const amountSum = Number(amount.value);
   let firstStep = Number(firstDelay.value);
   const delay = Number(delayStep.value);
@@ -19,9 +21,10 @@ function onStart(evt) {
       })
       .catch(({ position, delay }) => {
         Notify.failure(`❌ Rejected promise ${position} in ${delay}ms`);
-      });
+      })
     firstStep += delay;
   }
+  evt.target.reset();
 }
 
 function createPromise(position, delay) {

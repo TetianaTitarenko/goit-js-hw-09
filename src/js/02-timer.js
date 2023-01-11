@@ -19,6 +19,8 @@ startBtn.setAttribute(`disabled`, true);
 let timeId = null;
 let backTime = 0;
 
+const currentDate = new Date();
+
 const daysDate = document.querySelector("[data-days]");
 const hoursDate = document.querySelector("[data-hours]");
 const minutesDate = document.querySelector("[data-minutes]");
@@ -29,11 +31,13 @@ const options = {
   time_24hr: true,
   defaultDate: new Date(),
     minuteIncrement: 1,
-        locale: {
-        firstDayOfWeek: 1
-    },
   onClose(selectedDates) {
-    console.log(selectedDates[0]);
+    if (selectedDates[0] - currentDate <0) {
+      Notify.failure('Please choose a date in the future');
+    }
+    else {
+      startBtn.removeAttribute(`disabled`);
+    }
   },
 };
 
@@ -45,24 +49,15 @@ function onClickButton() {
   timeId = setInterval(() => {
     backTime = fp.selectedDates[0] - new Date();
     const updateTime = convertMs(backTime);
-    console.log(updateTime)
     updateClock(updateTime);
+    startBtn.setAttribute(`disabled`, true);
     
-    if (updateTime <= 900) {
-    clearInterval(timeId)
+    if (backTime <= 900) {
+      clearInterval(timeId)
+      startBtn.removeAttribute(`disabled`);
           }
   }, 1000)
-  
-};
-
-input.oninput = function () {
-  if (fp.selectedDates[0] <= new Date()) {
-    startBtn.setAttribute(`disabled`, true);
-    Notify.failure('Please choose a date in the future');
-  } else {
-    startBtn.removeAttribute(`disabled`);
-  }
-}
+  };
 
 function convertMs(ms) {
   // Number of milliseconds per unit of time
